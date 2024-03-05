@@ -3,7 +3,8 @@ import dotenv from "dotenv";
 dotenv.config();
 import cors from "cors";
 import connectDB from "./config/db.js";
-import products from "../data/products.js";
+import productRoutes from "./routes/productRoutes.js";
+import { errorHandler, notFound } from "./middlewares/errorMiddleware.js";
 
 // MongoDB Connection
 connectDB();
@@ -16,18 +17,11 @@ const PORT = process.env.PORT || 8000;
 app.use(cors());
 
 // Routes
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
+app.use("/api/v1/products", productRoutes);
 
-app.get("/api/v1/products", (req, res) => {
-  res.status(200).json(products);
-});
-
-app.get("/api/v1/products/:id", (req, res) => {
-  const product = products.find((p) => p._id == req.params.id);
-  res.status(200).json(product);
-});
+// Routes - Error Handling
+app.use(notFound)
+app.use(errorHandler)
 
 // Server
 app.listen(PORT, () => {
